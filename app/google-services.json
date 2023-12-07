@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "623991779221",
+    "project_id": "family-trip-aa242",
+    "storage_bucket": "family-trip-aa242.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623991779221:android:7d744c7d20247d1fccd09c",
+        "android_client_info": {
+          "package_name": "ie.setu.familytrip"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlkqbgzJFrxzB1RLoFXvVuItglqsQMcEU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
