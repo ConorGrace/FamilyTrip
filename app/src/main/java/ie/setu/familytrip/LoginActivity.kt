@@ -1,12 +1,11 @@
 package ie.setu.familytrip
-
+import android.util.Log
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.media3.common.util.Log
 import com.google.firebase.auth.FirebaseAuth
 
 
