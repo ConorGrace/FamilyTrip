@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import ie.setu.familytrip.models.Trip
 
 private const val TAG = "PostsActivity"
 class PostsActivity : AppCompatActivity() {
@@ -17,14 +19,16 @@ class PostsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_posts)
 
         firestoreDb = FirebaseFirestore.getInstance()
-        val postsReference = firestoreDb.collection("trips")
+        val postsReference = firestoreDb.collection("trips").limit(20)
+            .orderBy("creation_time_ms", Query.Direction.DESCENDING)
         postsReference.addSnapshotListener { snapshot, exception ->
             if (exception != null || snapshot == null) {
-                Log.e(TAG, "Exception when querying posts", exception)
+                Log.e(TAG, "Exception when querying trips", exception)
                 return@addSnapshotListener
             }
-            for (document in snapshot.documents) {
-                Log.i(TAG, "Document ${document.id}: ${document.data}")
+            val tripList = snapshot.toObjects(Trip::class.java)
+            for (trip in tripList) {
+                Log.i(TAG, "Document ${trip}")
             }
         }
     }
