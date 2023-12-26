@@ -8,13 +8,17 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import ie.setu.familytrip.models.Trip
+import ie.setu.familytrip.models.User
 
 private const val TAG = "PostsActivity"
-class PostsActivity : AppCompatActivity() {
+private const val EXTRA_USERNAME = "EXTRA_USERNAME"
+open class PostsActivity : AppCompatActivity() {
 
+    private var signedInUser: User? = null
     private lateinit var firestoreDb: FirebaseFirestore
     private lateinit var trips:MutableList<Trip>
     private lateinit var adapter: TripsAdapter
@@ -28,10 +32,27 @@ class PostsActivity : AppCompatActivity() {
 
         rvPosts.adapter = adapter
         rvPosts.layoutManager = LinearLayoutManager(this)
-
         firestoreDb = FirebaseFirestore.getInstance()
-        val postsReference = firestoreDb.collection("trips").limit(20)
+
+        firestoreDb.collection("users")
+            .document(FirebaseAuth.getInstance().currentUser?.uid as String)
+            .get()
+            .addOnSuccessListener { userSnapshot ->
+                signedInUser = userSnapshot.toObject(User::class.java)
+                Log.i(TAG, "signed in user: $signedInUser")
+            }
+            .addOnFailureListener { exception ->
+                Log.i(TAG, "Failure fetching signed in user", exception)
+            }
+
+        var postsReference = firestoreDb.collection("trips").limit(20)
             .orderBy("creation_time_ms", Query.Direction.DESCENDING)
+
+        val username = intent.getStringExtra(EXTRA_USERNAME)
+        if (username != null) {
+            supportActionBar?.title = username
+            postsReference = postsReference.whereEqualTo("user.username", username)
+        }
         postsReference.addSnapshotListener { snapshot, exception ->
             if (exception != null || snapshot == null) {
                 Log.e(TAG, "Exception when querying trips", exception)
@@ -55,6 +76,7 @@ class PostsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_profile) {
             val intent = Intent( this, ProfileActivity::class.java)
+            intent.putExtra(EXTRA_USERNAME, signedInUser?.username)
             startActivity(intent)
         }
         return super.onOptionsItemSelected(item)
