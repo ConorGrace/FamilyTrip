@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -65,6 +66,12 @@ open class PostsActivity : AppCompatActivity() {
             for (trip in tripList) {
                 Log.i(TAG, "Document ${trip}")
             }
+        }
+        val fabCreate: FloatingActionButton = findViewById(R.id.fabCreate)
+
+        fabCreate.setOnClickListener {
+            val intent = Intent(this, CreateActivity::class.java)
+            startActivity(intent)
         }
     }
 
