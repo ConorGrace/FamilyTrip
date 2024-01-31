@@ -21,6 +21,22 @@
             android:inputType="textEmailAddress" />
 
         <EditText
+            android:id="@+id/setUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Username"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/setCountry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Country of Residence"
+            android:inputType="text" />
+
+        <EditText
             android:id="@+id/setPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
