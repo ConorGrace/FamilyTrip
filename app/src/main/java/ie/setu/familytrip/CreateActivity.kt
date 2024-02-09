@@ -10,12 +10,16 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.play.core.integrity.i
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import ie.setu.familytrip.models.Trip
 import ie.setu.familytrip.models.User
+
 
 private const val TAG = "CreateActivity"
 private const val PICK_PHOTO_CODE = 1234
@@ -24,11 +28,13 @@ private lateinit var imageView: ImageView
 private lateinit var btnPickImage: Button
 private lateinit var btnSubmit: Button
 private lateinit var etDescription: EditText
+private lateinit var btnLocation: Button
 class CreateActivity : AppCompatActivity() {
     private var signedInUser: User? = null
     private var photoUri: Uri? = null
     private lateinit var firestoreDb: FirebaseFirestore
     private lateinit var storageReference: StorageReference
+    private lateinit var mapIntentLauncher : ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create)
@@ -48,6 +54,7 @@ class CreateActivity : AppCompatActivity() {
         imageView = findViewById(R.id.imageView)
         btnPickImage = findViewById(R.id.btnPickImage)
         btnSubmit = findViewById(R.id.btnSubmit)
+        btnLocation = findViewById(R.id.btnLocation)
         etDescription = findViewById(R.id.etDescription)
 
         btnPickImage.setOnClickListener{
@@ -59,10 +66,23 @@ class CreateActivity : AppCompatActivity() {
             }
         }
 
+        registerMapCallback()
+
+        btnLocation.setOnClickListener{
+            launchMapActivity()
+        }
+
         btnSubmit.setOnClickListener{
             handleSubmitButtonClick()
         }
     }
+
+    private fun registerMapCallback() {
+        mapIntentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            Log.i(TAG, "Map Loaded")
+        }
+    }
+
 
     private fun handleSubmitButtonClick() {
         if(photoUri == null) {
@@ -105,6 +125,14 @@ class CreateActivity : AppCompatActivity() {
                 startActivity(postIntent)
                 finish()
             }
+    }
+
+    private fun launchMapActivity() {
+        val mapIntent = Intent(this, MapActivity::class.java)
+        // Add any extras or information needed for the map activity
+        // mapIntent.putExtra("KEY", "VALUE")
+        mapIntentLauncher.launch(mapIntent)
+        finish() // Finish the current activity if needed
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

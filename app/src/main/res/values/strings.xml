@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Family Trip</string>
+    <string name="title_activity_map">MapActivity</string>
+    <string name="button_location">Set Location</string>
 </resources>
