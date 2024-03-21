@@ -17,19 +17,22 @@ import ie.setu.familytrip.models.User
 
 private const val TAG = "PostsActivity"
 private const val EXTRA_USERNAME = "EXTRA_USERNAME"
-open class PostsActivity : AppCompatActivity() {
+private const val SELECTED_TRIP = "SELECTED_TRIP"
+
+open class PostsActivity : AppCompatActivity(), TripsAdapter.OnItemClickListener {
 
     private var signedInUser: User? = null
     private lateinit var firestoreDb: FirebaseFirestore
-    private lateinit var trips:MutableList<Trip>
+    private lateinit var trips: MutableList<Trip>
     private lateinit var adapter: TripsAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_posts)
         val rvPosts: RecyclerView = findViewById(R.id.rvPosts)
 
         trips = mutableListOf()
-        adapter = TripsAdapter(this, trips)
+        adapter = TripsAdapter(this, trips, this)
 
         rvPosts.adapter = adapter
         rvPosts.layoutManager = LinearLayoutManager(this)
@@ -80,9 +83,15 @@ open class PostsActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onItemClick(trip: Trip) {
+        val intent = Intent(this, CreateActivity::class.java)
+        intent.putExtra("SELECTED_TRIP", trip)
+        startActivity(intent)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_profile) {
-            val intent = Intent( this, ProfileActivity::class.java)
+            val intent = Intent(this, ProfileActivity::class.java)
             intent.putExtra(EXTRA_USERNAME, signedInUser?.username)
             startActivity(intent)
         }

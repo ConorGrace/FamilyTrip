@@ -37,6 +37,7 @@ class CreateActivity : AppCompatActivity() {
     private lateinit var mapIntentLauncher : ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var edit = false
         setContentView(R.layout.activity_create)
         storageReference = FirebaseStorage.getInstance().reference
         firestoreDb = FirebaseFirestore.getInstance()
@@ -56,6 +57,15 @@ class CreateActivity : AppCompatActivity() {
         btnSubmit = findViewById(R.id.btnSubmit)
         btnLocation = findViewById(R.id.btnLocation)
         etDescription = findViewById(R.id.etDescription)
+
+        val selectedTrip: Trip? = intent.getParcelableExtra("SELECTED_TRIP")
+
+        if (intent.hasExtra("SELECTED_TRIP")) {
+            edit = true
+            if (selectedTrip != null) {
+                etDescription.setText(selectedTrip.description)
+            }
+        }
 
         btnPickImage.setOnClickListener{
             Log.i(TAG, "Open up image picker on Device")
