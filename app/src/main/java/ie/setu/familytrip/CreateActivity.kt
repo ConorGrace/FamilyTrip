@@ -17,8 +17,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import ie.setu.familytrip.models.Location
 import ie.setu.familytrip.models.Trip
 import ie.setu.familytrip.models.User
+
 
 
 private const val TAG = "CreateActivity"
@@ -35,6 +37,7 @@ class CreateActivity : AppCompatActivity() {
     private lateinit var firestoreDb: FirebaseFirestore
     private lateinit var storageReference: StorageReference
     private lateinit var mapIntentLauncher : ActivityResultLauncher<Intent>
+    var location = Location(52.245696, -7.139102, 15f)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var edit = false
@@ -88,9 +91,18 @@ class CreateActivity : AppCompatActivity() {
     }
 
     private fun registerMapCallback() {
-        mapIntentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            Log.i(TAG, "Map Loaded")
-        }
+        mapIntentLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+            { result ->
+                when (result.resultCode) {
+                    RESULT_OK -> {
+                        if (result.data != null) {
+                            location = result.data!!.extras?.getParcelable("location")!!
+                        } // end of if
+                    }
+                    RESULT_CANCELED -> { } else -> { }
+                }
+            }
     }
 
 
@@ -138,11 +150,10 @@ class CreateActivity : AppCompatActivity() {
     }
 
     private fun launchMapActivity() {
-        val mapIntent = Intent(this, MapActivity::class.java)
-        // Add any extras or information needed for the map activity
-        // mapIntent.putExtra("KEY", "VALUE")
-        mapIntentLauncher.launch(mapIntent)
-        finish() // Finish the current activity if needed
+
+        val launcherIntent = Intent(this, MapActivity::class.java)
+            .putExtra("location", location)
+        mapIntentLauncher.launch(launcherIntent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -155,7 +166,6 @@ class CreateActivity : AppCompatActivity() {
             }
         }
             else {
-                Toast.makeText(this, "Image picker action cancelled", Toast.LENGTH_SHORT).show()
             }
     }
 }
