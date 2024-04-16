@@ -1,18 +1,20 @@
 package ie.setu.familytrip
 
+
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.play.core.integrity.i
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -20,7 +22,7 @@ import com.google.firebase.storage.StorageReference
 import ie.setu.familytrip.models.Location
 import ie.setu.familytrip.models.Trip
 import ie.setu.familytrip.models.User
-
+import ie.setu.familytrip.R
 
 
 private const val TAG = "CreateActivity"
@@ -31,6 +33,7 @@ private lateinit var btnPickImage: Button
 private lateinit var btnSubmit: Button
 private lateinit var etDescription: EditText
 private lateinit var btnLocation: Button
+private lateinit var spinnerCountries: Spinner
 class CreateActivity : AppCompatActivity() {
     private var signedInUser: User? = null
     private var photoUri: Uri? = null
@@ -60,6 +63,12 @@ class CreateActivity : AppCompatActivity() {
         btnSubmit = findViewById(R.id.btnSubmit)
         btnLocation = findViewById(R.id.btnLocation)
         etDescription = findViewById(R.id.etDescription)
+        spinnerCountries = findViewById(R.id.spinner_countries)
+
+        val countriesArray = resources.getStringArray(R.array.countries)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, countriesArray)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCountries.adapter = adapter
 
         val selectedTrip: Trip? = intent.getParcelableExtra("SELECTED_TRIP")
 

@@ -31,6 +31,17 @@
             android:hint="Description"
             android:layout_marginTop="8dp" />
 
+    <Spinner
+        android:id="@+id/spinner_countries"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <RatingBar
+        android:id="@+id/ratingBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numStars="5" />
+
     <Button
         android:id="@+id/btnLocation"
         android:layout_width="match_parent"
@@ -44,4 +55,5 @@
             android:layout_height="wrap_content"
             android:text="Submit"
             android:layout_marginTop="8dp" />
-    </LinearLayout>
+
+</LinearLayout>

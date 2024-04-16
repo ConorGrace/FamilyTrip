@@ -2,4 +2,16 @@
     <string name="app_name">Family Trip</string>
     <string name="title_activity_map">MapActivity</string>
     <string name="button_location">Set Location</string>
+    <string-array name="countries">
+        <item>France</item>
+        <item>Italy</item>
+        <item>Spain</item>
+        <item>Thailand</item>
+        <item>Japan</item>
+        <item>United States</item>
+        <item>Australia</item>
+        <item>Greece</item>
+        <item>Canada</item>
+        <item>Brazil</item>
+    </string-array>
 </resources>

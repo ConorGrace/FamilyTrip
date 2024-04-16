@@ -10,6 +10,7 @@ android {
     namespace = "ie.setu.familytrip"
     compileSdk = 34
 
+
     defaultConfig {
         applicationId = "ie.setu.familytrip"
         minSdk = 24

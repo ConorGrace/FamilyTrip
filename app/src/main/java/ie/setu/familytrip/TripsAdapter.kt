@@ -1,14 +1,12 @@
-package ie.setu.familytrip
-
 import android.content.Context
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import ie.setu.familytrip.R
 import ie.setu.familytrip.databinding.ItemPostBinding
 import ie.setu.familytrip.models.Trip
 import java.math.BigInteger
@@ -17,23 +15,37 @@ import java.security.MessageDigest
 class TripsAdapter(
     val context: Context,
     val trips: List<Trip>,
-    val onItemClickListener: OnItemClickListener? = null
-) : RecyclerView.Adapter<TripsAdapter.ViewHolder>() {
+    val onItemClickListener: OnItemClickListener? = null,
+    val countries: Array<String> = emptyArray() // Update to use the countries array
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemClick(trip: Trip)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_ITEM) {
+            val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ViewHolder(binding)
+        } else {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_spinner, parent, false)
+            ViewHolderSpinner(view)
+        }
     }
 
-    override fun getItemCount() = trips.size
+    override fun getItemCount() = trips.size + 1 // Add 1 for the spinner
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val trip = trips[holder.adapterPosition]
-        holder.bind(trip, onItemClickListener)
+    override fun getItemViewType(position: Int): Int {
+        return if (position == 0) VIEW_TYPE_SPINNER else VIEW_TYPE_ITEM
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is ViewHolder) {
+            val trip = trips[position - 1] // Subtract 1 to adjust for spinner
+            holder.bind(trip, onItemClickListener)
+        } else if (holder is ViewHolderSpinner) {
+            holder.bind(countries)
+        }
     }
 
     inner class ViewHolder(private val binding: ItemPostBinding) :
@@ -71,5 +83,20 @@ class TripsAdapter(
             val hex = bigInt.abs().toString(16)
             return "https://www.gravatar.com/avatar/$hex?d=identicon"
         }
+    }
+
+    inner class ViewHolderSpinner(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val spinner: Spinner = itemView.findViewById(R.id.spinner_countries)
+
+        fun bind(countries: Array<String>) {
+            val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, countries)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter
+        }
+    }
+
+    companion object {
+        private const val VIEW_TYPE_ITEM = 0
+        private const val VIEW_TYPE_SPINNER = 1
     }
 }
