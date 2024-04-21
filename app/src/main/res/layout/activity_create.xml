@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -30,16 +34,26 @@
             android:ems="10"
             android:hint="Description"
             android:layout_marginTop="8dp" />
+        <EditText
+            android:id="@+id/etFamilySize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Family Size"
+            android:layout_marginTop="8dp" />
 
     <Spinner
         android:id="@+id/spinner_countries"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
 
     <RatingBar
-        android:id="@+id/ratingBar"
-        android:layout_width="match_parent"
+        android:id="@+id/rtnStars"
+        android:layout_width="238dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:numStars="5" />
 
     <Button
@@ -57,3 +71,4 @@
             android:layout_marginTop="8dp" />
 
 </LinearLayout>
+</ScrollView>

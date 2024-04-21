@@ -1,5 +1,6 @@
 package ie.setu.familytrip
 
+import CreateActivity
 import TripsAdapter
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -33,7 +34,7 @@ open class PostsActivity : AppCompatActivity(), TripsAdapter.OnItemClickListener
         val rvPosts: RecyclerView = findViewById(R.id.rvPosts)
 
         trips = mutableListOf()
-        adapter = TripsAdapter(this, trips, this)
+        adapter = TripsAdapter(this, trips, this, false)
 
         rvPosts.adapter = adapter
         rvPosts.layoutManager = LinearLayoutManager(this)

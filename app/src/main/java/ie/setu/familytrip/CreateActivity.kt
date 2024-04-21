@@ -1,6 +1,3 @@
-package ie.setu.familytrip
-
-
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -10,6 +7,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.RatingBar
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -19,11 +17,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import ie.setu.familytrip.MapActivity
+import ie.setu.familytrip.PostsActivity
 import ie.setu.familytrip.models.Location
 import ie.setu.familytrip.models.Trip
 import ie.setu.familytrip.models.User
 import ie.setu.familytrip.R
-
 
 private const val TAG = "CreateActivity"
 private const val PICK_PHOTO_CODE = 1234
@@ -34,13 +33,17 @@ private lateinit var btnSubmit: Button
 private lateinit var etDescription: EditText
 private lateinit var btnLocation: Button
 private lateinit var spinnerCountries: Spinner
+private lateinit var rtnStars: RatingBar
+private lateinit var etFamilySize: EditText
+
 class CreateActivity : AppCompatActivity() {
     private var signedInUser: User? = null
     private var photoUri: Uri? = null
     private lateinit var firestoreDb: FirebaseFirestore
     private lateinit var storageReference: StorageReference
-    private lateinit var mapIntentLauncher : ActivityResultLauncher<Intent>
-    var location = Location(52.245696, -7.139102, 15f)
+    private lateinit var mapIntentLauncher: ActivityResultLauncher<Intent>
+    private var location = Location(52.245696, -7.139102, 15f)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var edit = false
@@ -64,6 +67,8 @@ class CreateActivity : AppCompatActivity() {
         btnLocation = findViewById(R.id.btnLocation)
         etDescription = findViewById(R.id.etDescription)
         spinnerCountries = findViewById(R.id.spinner_countries)
+        rtnStars = findViewById(R.id.rtnStars)
+        etFamilySize = findViewById(R.id.etFamilySize)
 
         val countriesArray = resources.getStringArray(R.array.countries)
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, countriesArray)
@@ -76,10 +81,14 @@ class CreateActivity : AppCompatActivity() {
             edit = true
             if (selectedTrip != null) {
                 etDescription.setText(selectedTrip.description)
+                val countryIndex = countriesArray.indexOf(selectedTrip.spinnerCountries)
+                spinnerCountries.setSelection(countryIndex)
+                rtnStars.rating = selectedTrip.rtnStars
+                etFamilySize.setText(selectedTrip.numFamSize.toString())
             }
         }
 
-        btnPickImage.setOnClickListener{
+        btnPickImage.setOnClickListener {
             Log.i(TAG, "Open up image picker on Device")
             val imagePickerIntent = Intent(Intent.ACTION_GET_CONTENT)
             imagePickerIntent.type = "image/*"
@@ -90,11 +99,11 @@ class CreateActivity : AppCompatActivity() {
 
         registerMapCallback()
 
-        btnLocation.setOnClickListener{
+        btnLocation.setOnClickListener {
             launchMapActivity()
         }
 
-        btnSubmit.setOnClickListener{
+        btnSubmit.setOnClickListener {
             handleSubmitButtonClick()
         }
     }
@@ -109,22 +118,24 @@ class CreateActivity : AppCompatActivity() {
                             location = result.data!!.extras?.getParcelable("location")!!
                         } // end of if
                     }
-                    RESULT_CANCELED -> { } else -> { }
+                    RESULT_CANCELED -> {
+                    }
+                    else -> {
+                    }
                 }
             }
     }
 
-
     private fun handleSubmitButtonClick() {
-        if(photoUri == null) {
+        if (photoUri == null) {
             Toast.makeText(this, "No Photo Selected", Toast.LENGTH_SHORT).show()
             return
         }
-        if(etDescription.text == null) {
+        if (etDescription.text == null) {
             Toast.makeText(this, "Description cannot be null", Toast.LENGTH_SHORT).show()
             return
         }
-        if(signedInUser == null) {
+        if (signedInUser == null) {
             Toast.makeText(this, "No signed In user, stop", Toast.LENGTH_SHORT).show()
             return
         }
@@ -139,19 +150,23 @@ class CreateActivity : AppCompatActivity() {
             }.continueWithTask { downloadUrlTask ->
                 val trip = Trip(
                     etDescription.text.toString(),
+                    spinnerCountries.selectedItem.toString(),
+                    rtnStars.rating,
+                    etFamilySize.text.toString().toInt(),
                     downloadUrlTask.result.toString(),
                     System.currentTimeMillis(),
-                    signedInUser)
+                    signedInUser
+                )
                 firestoreDb.collection("trips").add(trip)
             }.addOnCompleteListener { tripCreationTask ->
                 btnSubmit.isEnabled = true
                 if (!tripCreationTask.isSuccessful) {
-                    Log.e(TAG,"Exception during Firebase operations", tripCreationTask.exception)
+                    Log.e(TAG, "Exception during Firebase operations", tripCreationTask.exception)
                     Toast.makeText(this, "Failed to save trip", Toast.LENGTH_SHORT).show()
                 }
                 etDescription.text.clear()
                 imageView.setImageResource(0)
-                Toast.makeText(this,"Successful Trip Posting", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Successful Trip Posting", Toast.LENGTH_SHORT).show()
                 val postIntent = Intent(this, PostsActivity::class.java)
                 startActivity(postIntent)
                 finish()
@@ -159,22 +174,20 @@ class CreateActivity : AppCompatActivity() {
     }
 
     private fun launchMapActivity() {
-
         val launcherIntent = Intent(this, MapActivity::class.java)
             .putExtra("location", location)
         mapIntentLauncher.launch(launcherIntent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode,resultCode, data)
+        super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_PHOTO_CODE) {
-            if (resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 photoUri = data?.data
                 Log.i(TAG, "photoUri $photoUri")
                 imageView.setImageURI(photoUri)
             }
+        } else {
         }
-            else {
-            }
     }
 }

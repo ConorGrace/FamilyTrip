@@ -16,6 +16,7 @@ class TripsAdapter(
     val context: Context,
     val trips: List<Trip>,
     val onItemClickListener: OnItemClickListener? = null,
+    val showSpinner: Boolean = false,
     val countries: Array<String> = emptyArray()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -28,12 +29,19 @@ class TripsAdapter(
             val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             ViewHolder(binding)
         } else {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_spinner, parent, false)
-            ViewHolderSpinner(view)
+            if (showSpinner) { // Only inflate the spinner layout if showSpinner is true
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_spinner, parent, false)
+                ViewHolderSpinner(view)
+            } else {
+                // Return a dummy view holder if showSpinner is false
+                DummyViewHolder(View(context))
+            }
         }
     }
 
-    override fun getItemCount() = trips.size + 1
+    override fun getItemCount(): Int {
+        return if (showSpinner) trips.size + 1 else trips.size
+    }
 
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) VIEW_TYPE_SPINNER else VIEW_TYPE_ITEM
@@ -48,6 +56,8 @@ class TripsAdapter(
         }
     }
 
+    inner class DummyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+
     inner class ViewHolder(private val binding: ItemPostBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -56,6 +66,9 @@ class TripsAdapter(
         val ivPost: ImageView = itemView.findViewById(R.id.ivPost)
         val tvRelativeTime: TextView = itemView.findViewById(R.id.tvRelativeTime)
         val ivProfilePic: ImageView = itemView.findViewById(R.id.ivProfilePic)
+        val tvCountry: TextView = itemView.findViewById(R.id.tvCountry)
+        val tvFamilySize: TextView = itemView.findViewById(R.id.tvFamilySize)
+        val tvRating: TextView = itemView.findViewById(R.id.tvRating)
 
         fun bind(trip: Trip, onItemClickListener: OnItemClickListener?) {
             val username = trip.user?.username as String
@@ -70,6 +83,10 @@ class TripsAdapter(
                 DateUtils.WEEK_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
+
+            tvCountry.text = trip.spinnerCountries
+            tvFamilySize.text = "${trip.numFamSize} people"
+            tvRating.text = "${trip.numFamSize} stars"
 
             binding.root.setOnClickListener {
                 onItemClickListener?.onItemClick(trip)

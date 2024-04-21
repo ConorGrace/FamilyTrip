@@ -54,5 +54,26 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         tools:text="cool post text" />
+
+    <TextView
+        android:id="@+id/tvCountry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        tools:text="cool post text" />
+
+    <TextView
+        android:id="@+id/tvFamilySize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        tools:text="cool post text" />
+
+    <TextView
+        android:id="@+id/tvRating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        tools:text="cool post text" />
 </LinearLayout>
     </androidx.cardview.widget.CardView>
