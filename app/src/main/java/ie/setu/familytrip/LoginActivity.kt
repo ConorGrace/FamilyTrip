@@ -38,7 +38,6 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Email/Password can't be empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            // Firebase authentication check
 
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 btnLogin.isEnabled = true

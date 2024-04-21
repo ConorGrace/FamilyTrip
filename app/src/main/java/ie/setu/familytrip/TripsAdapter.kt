@@ -16,7 +16,7 @@ class TripsAdapter(
     val context: Context,
     val trips: List<Trip>,
     val onItemClickListener: OnItemClickListener? = null,
-    val countries: Array<String> = emptyArray() // Update to use the countries array
+    val countries: Array<String> = emptyArray()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface OnItemClickListener {
@@ -33,7 +33,7 @@ class TripsAdapter(
         }
     }
 
-    override fun getItemCount() = trips.size + 1 // Add 1 for the spinner
+    override fun getItemCount() = trips.size + 1
 
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) VIEW_TYPE_SPINNER else VIEW_TYPE_ITEM
