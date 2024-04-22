@@ -2,10 +2,9 @@ package ie.setu.familytrip
 
 import android.app.Activity
 import android.content.Intent
-import android.location.Address
-import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -16,13 +15,17 @@ import com.google.android.gms.maps.model.MarkerOptions
 import ie.setu.familytrip.databinding.ActivityMapBinding
 import ie.setu.familytrip.R
 import ie.setu.familytrip.models.Location
-import java.io.IOException
-import androidx.appcompat.widget.SearchView
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.RectangularBounds
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener {
 
     private lateinit var map: GoogleMap
-    private lateinit var searchView: SearchView
     private lateinit var binding: ActivityMapBinding
+    private lateinit var autocompleteFragment: AutocompleteSupportFragment
     private var location = Location()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,43 +33,35 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
         location = intent.extras?.getParcelable<Location>("location")!!
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        Places.initialize(applicationContext, getString(R.string.google_map_api_key))
 
-        // Find the SearchView from the layout
-        searchView = findViewById(R.id.idSearchView)
+        setupAutocompleteFragment()
+        setupMapFragment()
+    }
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                val location = searchView.query.toString()
-
-                var addressList: List<Address>? = null
-
-                if (location.isNotBlank()) {
-                    val geocoder = Geocoder(this@MapActivity)
-                    try {
-                        addressList = geocoder.getFromLocationName(location, 1)
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-
-                    val address = addressList?.get(0)
-                    if (address != null) {
-                        val latLng = LatLng(address.latitude, address.longitude)
-                        map.addMarker(MarkerOptions().position(latLng).title(location))
-                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
-                    } else {
-                        // Handle the case where address is null
-                    }
-                }
-                return false
+    private fun setupAutocompleteFragment() {
+        autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
+        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onPlaceSelected(place: Place) {
+                val latLng = place.latLng
+                val add = place.address
+                val id = place.id
+                val marker = addMarker(latLng)
+                marker.title = "$add"
+                marker.snippet = "$id"
+                zoomOnMap(latLng)
             }
 
-            override fun onQueryTextChange(newText: String): Boolean {
-                return false
+            override fun onError(status: com.google.android.gms.common.api.Status) {
+                Toast.makeText(this@MapActivity, "Error while searching: ${status.statusMessage}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun setupMapFragment() {
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -82,7 +77,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, location.zoom))
     }
 
-    override fun onMarkerDrag(p0: Marker) {}
+    override fun onMarkerDragStart(marker: Marker) {}
+
+    override fun onMarkerDrag(marker: Marker) {}
 
     override fun onMarkerDragEnd(marker: Marker) {
         location.lat = marker.position.latitude
@@ -90,7 +87,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
         location.zoom = map.cameraPosition.zoom
     }
 
-    override fun onMarkerDragStart(p0: Marker) {}
+
+
+    private fun zoomOnMap(latLng: LatLng) {
+        val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(latLng, 12f)
+        map.animateCamera(newLatLngZoom)
+    }
+
+    private fun addMarker(position:LatLng):Marker {
+        val marker = map?.addMarker(MarkerOptions()
+            .position(position)
+            .title("Marker"))
+
+        return marker!!
+    }
 
     override fun onBackPressed() {
         val resultIntent = Intent()

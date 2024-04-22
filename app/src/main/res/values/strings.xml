@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Family Trip</string>
     <string name="title_activity_map">MapActivity</string>
+    <string name="google_map_api_key">AIzaSyAZlxv1robfR-w6N20D7VIzQoczUr2zUMA</string>
     <string name="button_location">Set Location</string>
     <string-array name="countries">
         <item>France</item>
