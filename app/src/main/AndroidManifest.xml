@@ -44,7 +44,7 @@
             android:exported="false" />
         <activity
             android:name=".CreateActivity"
-            android:exported="false" />
+        android:exported="false" />
         <activity
             android:name=".ProfileActivity"
             android:exported="false" />

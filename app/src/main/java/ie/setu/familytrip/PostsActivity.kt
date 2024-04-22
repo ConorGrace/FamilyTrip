@@ -1,6 +1,6 @@
 package ie.setu.familytrip
 
-import CreateActivity
+import ie.setu.familytrip.CreateActivity
 import TripsAdapter
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity

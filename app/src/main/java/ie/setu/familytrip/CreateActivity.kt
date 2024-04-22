@@ -1,3 +1,4 @@
+package ie.setu.familytrip
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -139,6 +140,17 @@ class CreateActivity : AppCompatActivity() {
             Toast.makeText(this, "No signed In user, stop", Toast.LENGTH_SHORT).show()
             return
         }
+        val familySizeText = etFamilySize.text.toString()
+        if (familySizeText.isEmpty()) {
+            Toast.makeText(this, "Family Size cannot be empty", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val familySize = familySizeText.toIntOrNull()
+        if (familySize == null) {
+            Toast.makeText(this, "Invalid Family Size", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         btnSubmit.isEnabled = false
         val photoUploadUri = photoUri as Uri
@@ -152,7 +164,7 @@ class CreateActivity : AppCompatActivity() {
                     etDescription.text.toString(),
                     spinnerCountries.selectedItem.toString(),
                     rtnStars.rating,
-                    etFamilySize.text.toString().toInt(),
+                    familySize,
                     downloadUrlTask.result.toString(),
                     System.currentTimeMillis(),
                     signedInUser
