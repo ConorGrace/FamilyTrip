@@ -49,7 +49,7 @@ class TripsAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is ViewHolder) {
-            val trip = trips[position - 1] // Subtract 1 to adjust for spinner
+            val trip = trips[position - 1]
             holder.bind(trip, onItemClickListener)
         } else if (holder is ViewHolderSpinner) {
             holder.bind(countries)
