@@ -13,13 +13,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import ie.setu.familytrip.databinding.ActivityMapBinding
-import ie.setu.familytrip.R
 import ie.setu.familytrip.models.Location
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.model.RectangularBounds
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener {
 
@@ -27,6 +26,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
     private lateinit var binding: ActivityMapBinding
     private lateinit var autocompleteFragment: AutocompleteSupportFragment
     private var location = Location()
+    private val markerList: MutableList<Marker> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +34,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
         setContentView(binding.root)
         location = intent.extras?.getParcelable<Location>("location")!!
         Places.initialize(applicationContext, getString(R.string.google_map_api_key))
+
+        // Load markers based on the selected trip
+        loadMarkers()
 
         setupAutocompleteFragment()
         setupMapFragment()
@@ -87,8 +90,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
         location.zoom = map.cameraPosition.zoom
     }
 
-
-
     private fun zoomOnMap(latLng: LatLng) {
         val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(latLng, 12f)
         map.animateCamera(newLatLngZoom)
@@ -99,7 +100,56 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
             .position(position)
             .title("Marker"))
 
+        markerList.add(marker!!) // Add the marker to the list
+
+        saveMarkerToFirestore(marker)
+
         return marker!!
+    }
+
+    private fun saveMarkerToFirestore(marker: Marker?) {
+        if (marker != null) {
+            val markerData = hashMapOf(
+                "latitude" to marker.position.latitude,
+                "longitude" to marker.position.longitude,
+                // Add any other details you want to save
+            )
+
+            val db = FirebaseFirestore.getInstance()
+            db.collection("markers")
+                .add(markerData)
+                .addOnSuccessListener { documentReference ->
+                    Toast.makeText(
+                        this@MapActivity,
+                        "Marker added to Firestore",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this@MapActivity,
+                        "Error adding marker to Firestore",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        }
+    }
+
+    private fun loadMarkers() {
+        val firestoreDb = FirebaseFirestore.getInstance()
+        val markersCollection = firestoreDb.collection("markers")
+
+        markersCollection.get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val latLng = LatLng(document.getDouble("latitude")!!, document.getDouble("longitude")!!)
+                    val marker = addMarker(latLng)
+                    // You can customize marker properties here if needed
+                }
+            }
+            .addOnFailureListener { exception ->
+                // Handle failure
+            }
     }
 
     override fun onBackPressed() {
@@ -110,3 +160,4 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
         super.onBackPressed()
     }
 }
+

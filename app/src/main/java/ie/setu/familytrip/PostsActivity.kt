@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -65,7 +66,7 @@ open class PostsActivity : AppCompatActivity(), TripsAdapter.OnItemClickListener
                 Log.i(TAG, "Failure fetching signed in user", exception)
             }
 
-        // Check if the username extra is present
+
         val username = intent.getStringExtra(EXTRA_USERNAME)
         var postsReference = firestoreDb.collection("trips").limit(20)
             .orderBy("creation_time_ms", Query.Direction.DESCENDING)
@@ -100,7 +101,7 @@ open class PostsActivity : AppCompatActivity(), TripsAdapter.OnItemClickListener
                 trips.addAll(tripList)
                 adapter.notifyDataSetChanged()
 
-                Log.d(TAG, "Filtered Trip List Size: ${trips.size}") // Check the size of the trips list
+                Log.d(TAG, "Filtered Trip List Size: ${trips.size}")
             } else {
                 Log.d(TAG, "Snapshot is null")
             }
@@ -116,6 +117,7 @@ open class PostsActivity : AppCompatActivity(), TripsAdapter.OnItemClickListener
         val btnApplyFilter: Button = findViewById(R.id.btnApplyFilter)
         btnApplyFilter.setOnClickListener {
             applyFilters()
+            Toast.makeText(this, "Tilt the phone to reset filter", Toast.LENGTH_SHORT).show()
         }
     }
 
