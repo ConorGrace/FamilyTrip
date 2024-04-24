@@ -109,23 +109,23 @@ class CreateActivity : AppCompatActivity() {
         }
     }
 
-    private fun registerMapCallback() {
-        mapIntentLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult())
-            { result ->
-                when (result.resultCode) {
-                    RESULT_OK -> {
-                        if (result.data != null) {
-                            location = result.data!!.extras?.getParcelable("location")!!
-                        } // end of if
-                    }
-                    RESULT_CANCELED -> {
-                    }
-                    else -> {
+        private fun registerMapCallback() {
+            mapIntentLauncher =
+                registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+                { result ->
+                    when (result.resultCode) {
+                        RESULT_OK -> {
+                            if (result.data != null) {
+                                location = result.data!!.extras?.getParcelable("location")!!
+                            }
+                        }
+                        RESULT_CANCELED -> {
+                        }
+                        else -> {
+                        }
                     }
                 }
-            }
-    }
+        }
 
     private fun handleSubmitButtonClick() {
         if (photoUri == null) {

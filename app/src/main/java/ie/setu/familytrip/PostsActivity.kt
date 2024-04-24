@@ -153,7 +153,7 @@ open class PostsActivity : AppCompatActivity(), TripsAdapter.OnItemClickListener
             Log.d(TAG, "Query: $query")
         }
 
-        // Execute query and update RecyclerView
+        // this executes the queries and filters the list
         query.get()
             .addOnSuccessListener { snapshot ->
                 val tripList = snapshot.toObjects(Trip::class.java)

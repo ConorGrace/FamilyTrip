@@ -22,6 +22,7 @@ class ProfileActivity : PostsActivity() {
             Log.i(TAG, "User Wants to logout")
             FirebaseAuth.getInstance().signOut()
             startActivity(Intent(this, LoginActivity::class.java))
+            finish()
         }
         return super.onOptionsItemSelected(item)
     }

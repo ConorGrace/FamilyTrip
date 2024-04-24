@@ -35,7 +35,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
         location = intent.extras?.getParcelable<Location>("location")!!
         Places.initialize(applicationContext, getString(R.string.google_map_api_key))
 
-        // Load markers based on the selected trip
+        // Loads the markers based on the selected trip
         loadMarkers()
 
         setupAutocompleteFragment()
@@ -100,7 +100,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
             .position(position)
             .title("Marker"))
 
-        markerList.add(marker!!) // Add the marker to the list
+        markerList.add(marker!!) // Add the marker to the list of markers within the app
 
         saveMarkerToFirestore(marker)
 
@@ -144,11 +144,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
                 for (document in documents) {
                     val latLng = LatLng(document.getDouble("latitude")!!, document.getDouble("longitude")!!)
                     val marker = addMarker(latLng)
-                    // You can customize marker properties here if needed
                 }
             }
             .addOnFailureListener { exception ->
-                // Handle failure
             }
     }
 

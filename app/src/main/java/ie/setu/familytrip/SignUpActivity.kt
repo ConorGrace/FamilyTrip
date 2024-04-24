@@ -41,20 +41,22 @@ class SignUpActivity : AppCompatActivity() {
             val confirmpassword = confirmPassword.text.toString()
             if (email.isBlank() || password.isBlank()) {
                 Toast.makeText(this, "Email/Password can't be empty", Toast.LENGTH_SHORT).show()
+                btnSignUp.isEnabled = true
                 return@setOnClickListener
             }
             if (password != confirmpassword) {
                 Toast.makeText(this, "Passwords must be the same", Toast.LENGTH_SHORT).show()
+                btnSignUp.isEnabled = true
                 return@setOnClickListener
             }
 
-            // Firebase authentication for login
+            // Firebase authentication for login code, using the email and password fields as the user creation tools
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 btnSignUp.isEnabled = true
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     if (user != null) {
-                        // User is signed in
+                        // User is signed into app, and added as a part of the model
                         val newUser =
                             User(username, country, user.uid)
                         addUserDataToFirestore(newUser)
@@ -79,7 +81,7 @@ class SignUpActivity : AppCompatActivity() {
     private fun addUserDataToFirestore(user: User) {
         val db = FirebaseFirestore.getInstance()
         db.collection("users")
-            .document(user.uid)  // We use the users uuid that was generated before
+            .document(user.uid)  // We use the users uuid that was generated before to stay logged in
             .set(user)
             .addOnSuccessListener {
                 Log.d(TAG, "User data added to Firestore successfully")
